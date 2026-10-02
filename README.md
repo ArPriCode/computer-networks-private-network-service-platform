@@ -14,7 +14,7 @@ This is the Phase 1 lab design: Mac 1 runs DNS and Backend A; Mac 2 runs Nginx H
 | --- | --- |
 | Arun Kumar Giri | `2401010099` |
 | Gaurav Meena | `2401010169` |
-| Ritik Ranjan | Not provided |
+| Ritik Ranjan | `2401010388` |
 
 ## Architecture
 
