@@ -140,6 +140,16 @@ dig app.teamX.test
 
 Both names should resolve to Mac 2's current address. A direct query should identify Mac 1 as the DNS server.
 
+### Mac A and Mac B screenshots
+
+**Mac A — Backend A running**
+
+![Mac A running Backend A](Screenshot%202026-10-02%20at%2019.10.59.png)
+
+**Mac B — HTTPS requests reaching both backends**
+
+![Mac B showing HTTPS responses from both backends](Screenshot%202026-10-02%20at%2019.10.59-1.png)
+
 ### Direct backend requests
 
 ```sh
