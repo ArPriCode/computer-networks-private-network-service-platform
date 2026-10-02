@@ -76,6 +76,10 @@ Nginx on Mac 2 terminates HTTPS on port `8443`.
 
 The existing `ssl/cert.pem` is for `app.team1.test` and does not cover these TeamX names. A matching certificate is required before hostname-verified HTTPS testing. Keep all private keys local and never commit them.
 
+## Project report
+
+[View or download the Computer Networks project documentation](https://raw.githubusercontent.com/ArPriCode/computer-networks-private-network-service-platform/main/CN_Documentation.pdf).
+
 ## Setup
 
 Both Macs must be on the same Wi-Fi LAN. Install Python 3 on both, dnsmasq on Mac 1, and Nginx on Mac 2:
