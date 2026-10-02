@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Local TLS private key
+ssl/key.pem
+
+# macOS and editor files
+.DS_Store
+.vscode/
