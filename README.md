@@ -150,7 +150,13 @@ Both names should resolve to Mac 2's current address. A direct query should iden
 
 ![Mac B showing HTTPS responses from both backends](Screenshot%202026-10-02%20at%2019.10.59-1.png)
 
-### Direct backend requests
+**Mac A — Backend A request logs**
+
+![Mac A Backend A request logs](image-1.png)
+
+
+
+### backend requests
 
 ```sh
 curl http://10.7.15.60:3001/
