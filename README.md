@@ -1,5 +1,7 @@
 # Computer Networks Project 1
 
+**Team: StackHackers**
+
 **Course:** Computer Networks
 
 **Infrastructure:** Type 2, two physical Macs with combined roles
@@ -79,6 +81,8 @@ The existing `ssl/cert.pem` is for `app.team1.test` and does not cover these Tea
 ## Project report
 
 [View or download the Computer Networks project documentation](https://raw.githubusercontent.com/ArPriCode/computer-networks-private-network-service-platform/main/CN_Documentation.pdf).
+
+[Watch the project explanation video](https://www.youtube.com/watch?v=bXZ1VpMZV8c).
 
 ## Setup
 
