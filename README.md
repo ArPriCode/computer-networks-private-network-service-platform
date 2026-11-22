@@ -183,7 +183,17 @@ Never commit private keys or certificate signing requests.
   </tr>
 </table>
 
-The remaining screenshots and packet evidence are stored in [docs1/terminal_photo](docs1/terminal_photo). The packet capture is in [captures/phase1-mac1.pcap](captures/phase1-mac1.pcap).
+The remaining screenshots and packet evidence are stored in [evidence](evidence). The packet capture is in [captures/phase1-mac1.pcap](captures/phase1-mac1.pcap).
+
+### Phase 1 Evidence Folder
+
+| Evidence file | Preview |
+| --- | --- |
+| [Screenshot 22.02.25](evidence/Screenshot%202026-11-22%20at%2022.02.25.png) | [![Screenshot 22.02.25](evidence/Screenshot%202026-11-22%20at%2022.02.25.png)](evidence/Screenshot%202026-11-22%20at%2022.02.25.png) |
+| [Screenshot 22.02.31](evidence/Screenshot%202026-11-22%20at%2022.02.31.png) | [![Screenshot 22.02.31](evidence/Screenshot%202026-11-22%20at%2022.02.31.png)](evidence/Screenshot%202026-11-22%20at%2022.02.31.png) |
+| [Screenshot 22.02.40](evidence/Screenshot%202026-11-22%20at%2022.02.40.png) | [![Screenshot 22.02.40](evidence/Screenshot%202026-11-22%20at%2022.02.40.png)](evidence/Screenshot%202026-11-22%20at%2022.02.40.png) |
+| [Screenshot 22.02.54](evidence/Screenshot%202026-11-22%20at%2022.02.54.png) | [![Screenshot 22.02.54](evidence/Screenshot%202026-11-22%20at%2022.02.54.png)](evidence/Screenshot%202026-11-22%20at%2022.02.54.png) |
+| [Screenshot 22.03.01](evidence/Screenshot%202026-11-22%20at%2022.03.01.png) | [![Screenshot 22.03.01](evidence/Screenshot%202026-11-22%20at%2022.03.01.png)](evidence/Screenshot%202026-11-22%20at%2022.03.01.png) |
 
 ---
 
@@ -335,6 +345,22 @@ Failure behavior:
 | Primary DNS stopped | Clients with the backup resolver still resolve names |
 | Wrong DNS server | Name resolution fails despite direct IP connectivity |
 | Wrong destination port | Host is reachable but the TCP service port is unavailable |
+
+### Phase 2 Evidence Folder
+
+Phase 2 evidence is stored in [evidence](evidence) alongside the collected terminal and mobile captures:
+
+| Evidence | File |
+| --- | --- |
+| Team evidence 1 | [WhatsApp Image 22.02.11.jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.11.jpeg) |
+| Team evidence 2 | [WhatsApp Image 22.02.11 (1).jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.11%20(1).jpeg) |
+| Team evidence 3 | [WhatsApp Image 22.02.12.jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12.jpeg) |
+| Team evidence 4 | [WhatsApp Image 22.02.12 (1).jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12%20(1).jpeg) |
+| Team evidence 5 | [WhatsApp Image 22.02.12 (2).jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12%20(2).jpeg) |
+| Team evidence 6 | [WhatsApp Image 22.02.13.jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13.jpeg) |
+| Team evidence 7 | [WhatsApp Image 22.02.13 (1).jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13%20(1).jpeg) |
+
+Before the final demonstration, add focused outputs for each Phase 2 scenario: DNS resolver failover, TTL record changes, backend firewall isolation, backend failover, edge migration, and the diagnosed troubleshooting fault.
 
 ---
 
