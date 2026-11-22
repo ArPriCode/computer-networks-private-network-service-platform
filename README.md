@@ -1,140 +1,259 @@
-# Computer Networks Project 1
+# Computer Networks Private Network Service Platform
 
-**Team: StackHackers**
+<div align="center">
 
-**Course:** Computer Networks
+[![Course](https://img.shields.io/badge/Course-Computer_Networks-blue?style=for-the-badge)](#)
+[![Team](https://img.shields.io/badge/Team-StackHackers-0f766e?style=for-the-badge)](#team)
+[![Architecture](https://img.shields.io/badge/Architecture-Two_Mac_LAN-orange?style=for-the-badge)](#architecture)
 
-**Infrastructure:** Type 2, two physical Macs with combined roles
+</div>
 
-This is the Phase 1 lab design: Mac 1 runs DNS and Backend A; Mac 2 runs Nginx HTTPS and Backend B.
+**Private DNS + HTTPS Reverse Proxy + Load Balancing + Service Resilience**
 
-> **Status:** This checkout contains the target two-Mac configuration and runnable backend services. The live DNS, Nginx, firewall, certificate, packet-capture, and failover demonstrations remain hardware/administrator dependent and are not claimed to have been performed in this environment.
+This repository contains StackHackers' implementation of a fully local private networking platform. It demonstrates how a browser request travels through DNS, TCP, TLS, HTTP, Nginx load balancing, and two independent backend services across two macOS machines.
+
+> [!IMPORTANT]
+> This project is intentionally local. No cloud server or public hosting is used. The target private domain is `teamX.test`, and all live services are reachable only on the team's private LAN.
+
+---
 
 ## Team
 
-| Name | Roll number |
+| Member | Roll number |
 | --- | --- |
 | Arun Kumar Giri | `2401010099` |
 | Gaurav Meena | `2401010169` |
 | Ritik Ranjan | `2401010388` |
 
+---
+
 ## Architecture
 
-### Machines
+### Two-Mac Deployment
 
-| Machine | Current LAN IP | Services |
-| --- | --- | --- |
-| Mac 1 | `10.7.15.60` | dnsmasq DNS `:53`; Backend A `:3001` |
-| Mac 2 | `10.7.21.116` | Nginx HTTPS `:8443`; Backend B `:3002` |
+| Machine | Role | LAN address | Services |
+| --- | --- | --- | --- |
+| **Mac 1** | DNS + Backend A | `10.7.15.60` | dnsmasq `:53`, Backend A `:3001` |
+| **Mac 2** | Edge + Backend B | `10.7.21.116` | Nginx `:8443`, Backend B `:3002` |
 
-These are current DHCP leases and may change. Run `ifconfig en0` on each Mac before testing, then update the DNS and Nginx configuration if needed.
+> DHCP addresses may change. Verify both Macs with `ifconfig en0` and update the DNS and Nginx upstream configuration before deployment.
 
-### Request flow
+### Request Journey
 
 ```text
-Client (Mac 2 or another LAN machine)
-	| DNS query, UDP :53
-	v
-Mac 1: dnsmasq
-	| app.teamX.test, api.teamX.test -> 10.7.21.116
-	v
-Mac 2: Nginx HTTPS :8443 (TLS terminates here)
-	| default round-robin upstream
-	+--------------------> Mac 1: Backend A :3001
-	+--------------------> Mac 2: Backend B :3002
-
-Response: JSON, X-Backend: A or B, Cache-Control: max-age=60
+Browser / curl
+      |
+      | 1. DNS query for app.teamX.test
+      v
+Mac 1 - dnsmasq :53
+      |
+      | 2. Returns Mac 2 address: 10.7.21.116
+      v
+Mac 2 - Nginx :8443
+      |
+      | 3. TLS terminates
+      | 4. Round-robin HTTP proxy
+      +--------------------> Backend A :3001
+      |
+      +--------------------> Backend B :3002
+      |
+      v
+JSON response + X-Backend header
 ```
 
-DNS points to the Nginx proxy, not directly to either backend.
-
-| Hostname | Resolves to | Target |
+| Hostname | DNS answer | Service |
 | --- | --- | --- |
 | `app.teamX.test` | `10.7.21.116` | Mac 2 Nginx |
 | `api.teamX.test` | `10.7.21.116` | Mac 2 Nginx |
 
+More detail:
+
+- [Network topology](docs1/topology.md)
+- [IP addresses and ports](docs1/ip-addresses.md)
+- [Request flow](docs1/request-flow.md)
+- [Phase 1 documentation](docs1/README.md)
+
+---
+
+## Protocol Stack Demonstration
+
+| Layer | Technology | What it proves |
+| --- | --- | --- |
+| DNS | dnsmasq | Resolves private names to the edge server |
+| TCP | macOS networking | Opens a reliable connection to service ports |
+| TLS | OpenSSL + Nginx | Encrypts traffic and verifies the TeamX certificate |
+| HTTP | Python backend servers | Exposes JSON endpoints and response headers |
+| Load balancing | Nginx upstream | Distributes requests across both backends |
+| Caching | `Cache-Control`, `ETag` | Supports fresh responses and `304 Not Modified` |
+| Resilience | Nginx failover | Tries another backend when one upstream fails |
+
+---
+
 ## Backend API
 
-Both backends should expose the same endpoints, with the backend identity changed as appropriate.
+Both backends expose the same contract:
 
-| Method | Path | Response |
+| Method | Endpoint | Response |
 | --- | --- | --- |
-| `GET` | `/` | `{"backend":"A","message":"Hello from Backend A"}` or Backend B equivalent |
-| `GET` | `/api/status` | `{"backend":"A","status":"ok","server":"Backend A"}` or Backend B equivalent |
-| `HEAD` | `/` or `/api/status` | Same status and headers as GET, without a body |
+| `GET` | `/` | Identifies the backend and its running message |
+| `GET` | `/api/status` | Returns backend status and server identity |
+| `HEAD` | `/` or `/api/status` | Returns headers only |
 
-Successful responses should include `X-Backend: A` or `B`, `Cache-Control: max-age=60`, and `Content-Type: application/json`.
+Example:
 
-## TLS
+```json
+{
+  "backend": "A",
+  "status": "ok",
+  "server": "Backend A"
+}
+```
 
-Nginx on Mac 2 terminates HTTPS on port `8443`.
+Every successful response includes:
 
-| Item | Target configuration |
+```text
+Content-Type: application/json
+Cache-Control: max-age=60
+X-Backend: A | B
+ETag: "<content hash>"
+```
+
+Backend documentation:
+
+- [Backend A setup](backend-a/README.md)
+- [Backend B setup](backend-b/README.md)
+
+---
+
+## TLS and Certificate Trust
+
+Nginx terminates HTTPS on port `8443`.
+
+| Certificate item | Target |
 | --- | --- |
-| Local CA | TeamX local root CA |
-| Server certificate | `app.crt`, signed by the local CA |
-| Subject Alternative Names | `DNS:app.teamX.test`, `DNS:api.teamX.test` |
-| Client trust | Import the root CA into macOS Keychain; trusted clients should not need `curl -k` |
+| Local root CA | StackHackers TeamX root CA |
+| Server certificate | SAN certificate for both TeamX hostnames |
+| SAN entries | `DNS:app.teamX.test`, `DNS:api.teamX.test` |
+| Client trust | Import the root CA into the macOS Keychain |
 
-The existing `ssl/cert.pem` is for `app.team1.test` and does not cover these TeamX names. A matching certificate is required before hostname-verified HTTPS testing. Keep all private keys local and never commit them.
+Generate the certificate and private key on the designated machine:
 
-## Project report
+```sh
+./scripts/generate-certificate.sh
+```
 
-[View or download the Computer Networks project documentation](https://raw.githubusercontent.com/ArPriCode/computer-networks-private-network-service-platform/main/CN_Documentation.pdf).
+Never commit private keys or certificate signing requests.
 
-[Watch the project explanation video](https://www.youtube.com/watch?v=bXZ1VpMZV8c).
+---
+
+## Phase 1 Evidence
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <strong>Terminal evidence 1</strong><br>
+      <img src="docs1/terminal_photo/Screenshot%202026-11-22%20at%2022.02.25.png" alt="Terminal evidence 1">
+    </td>
+    <td width="50%" align="center">
+      <strong>Terminal evidence 2</strong><br>
+      <img src="docs1/terminal_photo/Screenshot%202026-11-22%20at%2022.02.31.png" alt="Terminal evidence 2">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>Terminal evidence 3</strong><br>
+      <img src="docs1/terminal_photo/Screenshot%202026-11-22%20at%2022.02.40.png" alt="Terminal evidence 3">
+    </td>
+    <td width="50%" align="center">
+      <strong>Terminal evidence 4</strong><br>
+      <img src="docs1/terminal_photo/Screenshot%202026-11-22%20at%2022.02.54.png" alt="Terminal evidence 4">
+    </td>
+  </tr>
+</table>
+
+The remaining screenshots and packet evidence are stored in [docs1/terminal_photo](docs1/terminal_photo). The packet capture is in [captures/phase1-mac1.pcap](captures/phase1-mac1.pcap).
+
+---
 
 ## Setup
 
-Both Macs must be on the same Wi-Fi LAN. Install Python 3 on both, dnsmasq on Mac 1, and Nginx on Mac 2:
+### 1. Install dependencies
+
+Both Macs:
 
 ```sh
 brew install python
-brew install dnsmasq # Mac 1
-brew install nginx   # Mac 2
 ```
 
-### Mac 1: DNS and Backend A
+Mac 1:
 
-Find the dnsmasq configuration path with `brew info dnsmasq`. Configure the current Mac 1 address and DNS records (replace addresses if DHCP leases changed):
+```sh
+brew install dnsmasq
+```
+
+Mac 2:
+
+```sh
+brew install nginx
+```
+
+### 2. Start Backend A
+
+On Mac 1:
+
+```sh
+cd backend-a
+python3 server.py
+```
+
+### 3. Start dnsmasq
+
+On Mac 1:
 
 ```conf
 listen-address=127.0.0.1,10.7.15.60
 address=/app.teamX.test/10.7.21.116
 address=/api.teamX.test/10.7.21.116
+local-ttl=30
 ```
-
-Start dnsmasq and Backend A:
 
 ```sh
 sudo brew services start dnsmasq
-cd backend-a && python3 server.py
+dig @10.7.15.60 app.teamX.test
 ```
 
-### Mac 2: Nginx HTTPS and Backend B
+### 4. Configure and start Nginx
 
-Set Mac 1 as the Wi-Fi DNS server, flush the resolver cache, and confirm the setting:
+On Mac 2:
 
 ```sh
-networksetup -setdnsservers "Wi-Fi" 10.7.15.60
+nginx -t
+brew services start nginx
+```
+
+Start Backend B:
+
+```sh
+cd backend-b
+python3 server.py
+```
+
+### 5. Configure the client DNS server
+
+On each client Mac:
+
+```sh
+sudo networksetup -setdnsservers "Wi-Fi" 10.7.15.60
 sudo dscacheutil -flushcache
 sudo killall -HUP mDNSResponder
 networksetup -getdnsservers "Wi-Fi"
 ```
 
-Configure Nginx to listen on `8443`, load the TeamX certificate and key, and proxy to `10.7.15.60:3001` and `10.7.21.116:3002`. Then validate and start Nginx and Backend B:
+---
 
-```sh
-nginx -t
-brew services start nginx
-cd backend-b && python3 server.py
-```
+## Verification
 
-## Verification commands
-
-Run these after configuring the target services. Update IPs if DHCP leases changed.
-
-### DNS
+### DNS resolution
 
 ```sh
 dig @10.7.15.60 app.teamX.test
@@ -142,71 +261,105 @@ dig @10.7.15.60 api.teamX.test
 dig app.teamX.test
 ```
 
-Both names should resolve to Mac 2's current address. A direct query should identify Mac 1 as the DNS server.
-
-### Mac A and Mac B screenshots
-
-**Mac A — Backend A running**
-
-![Mac A running Backend A](Screenshot%202026-10-02%20at%2019.10.59.png)
-
-**Mac B — HTTPS requests reaching both backends**
-
-![Mac B showing HTTPS responses from both backends](Screenshot%202026-10-02%20at%2019.10.59-1.png)
-
-**Mac A — Backend A request logs**
-
-![Mac A Backend A request logs](image-1.png)
-
-
-
-### backend requests
+### Direct backend checks
 
 ```sh
-curl http://10.7.15.60:3001/
-curl http://10.7.21.116:3002/
+curl -i http://10.7.15.60:3001/
+curl -i http://10.7.21.116:3002/
 curl -I http://10.7.15.60:3001/api/status
 curl -I http://10.7.21.116:3002/api/status
 ```
 
-### HTTPS through Nginx
-
-After the client trusts the TeamX CA:
+### HTTPS and load balancing
 
 ```sh
-curl https://app.teamX.test:8443/api/status
+curl -i https://app.teamX.test:8443/api/status
+./scripts/test-load-balancer.sh
+```
+
+Expected result:
+
+- HTTP `200 OK`
+- `X-Backend: A` or `X-Backend: B`
+- `Cache-Control: max-age=60`
+- `Content-Type: application/json`
+
+### Conditional caching
+
+```sh
 curl -I https://app.teamX.test:8443/api/status
+curl -i -H 'If-None-Match: "<etag>"' \
+  https://app.teamX.test:8443/api/status
 ```
 
-Expect HTTP `200`, `Content-Type: application/json`, `Cache-Control: max-age=60`, and `X-Backend: A` or `B`.
+If the entity has not changed, the backend may return `304 Not Modified`.
 
-### Load balancing
+### Network helper
 
 ```sh
-for i in {1..10}; do
-		printf 'Request %s: ' "$i"
-		curl -s -D - https://app.teamX.test:8443/api/status -o /dev/null | grep -i '^X-Backend:'
-done
+./scripts/network-info.sh
 ```
 
-With both backends healthy and no other upstream directives, requests use Nginx's default round-robin policy. Concurrent traffic means strict A/B alternation is not guaranteed.
+---
 
-## Security
+## Phase 2 Resilience
 
-- Never commit private keys (`*.key`, `*.pem`) or certificate signing requests (`*.csr`).
-- Keep the TeamX CA private key on its managing machine.
-- Import the local root CA only on lab clients that need to trust this test certificate.
+The target design adds:
 
-## Repository layout
+- A second DNS resolver
+- Primary and backup DNS configuration
+- Short DNS TTL values
+- Backend firewall isolation
+- Nginx upstream health failover
+- Controlled DNS-based edge migration
+- Faculty-injected troubleshooting
+
+Failure behavior:
+
+| Failure | Expected observation |
+| --- | --- |
+| Backend A stopped | Nginx continues serving through Backend B |
+| Both backends stopped | DNS and TLS still resolve, application returns `502 Bad Gateway` |
+| Primary DNS stopped | Clients with the backup resolver still resolve names |
+| Wrong DNS server | Name resolution fails despite direct IP connectivity |
+| Wrong destination port | Host is reachable but the TCP service port is unavailable |
+
+---
+
+## Repository Layout
 
 ```text
 .
-├── .gitignore
-├── backend-a/       Backend A source and README
-├── backend-b/       Backend B source and README
-├── docs/            Topology, request flow, and address guides
-├── evidence/        Evidence grouped by networking topic
-├── nginx/           Nginx configuration
-├── scripts/         Helper script files
-└── ssl/             Local certificate material; private keys stay untracked
+├── README.md
+├── backend-a/               Backend A Python service
+├── backend-b/               Backend B Python service
+├── backend-phase-1/         Phase 1 source snapshots
+├── backend-phase-2/         Phase 2 source snapshots
+├── captures/                Packet capture evidence
+├── config/
+│   ├── dnsmasq/             dnsmasq configuration
+│   └── ssl/                 Public CA material
+├── docs/                    Architecture documentation
+├── docs1/                   Phase 1 evidence and photographs
+├── nginx/                   Nginx load-balancer configuration
+├── scripts/                 Setup and verification scripts
+└── ssl/                     Local certificate material
 ```
+
+---
+
+## Project Resources
+
+- [Project report / documentation PDF](CN_Documentation.pdf)
+- [Raw project documentation PDF](https://raw.githubusercontent.com/ArPriCode/computer-networks-private-network-service-platform/main/CN_Documentation.pdf)
+- [Project explanation video](https://www.youtube.com/watch?v=bXZ1VpMZV8c)
+- [GitHub repository](https://github.com/ArPriCode/computer-networks-private-network-service-platform)
+
+---
+
+## Security
+
+- Never commit private keys, CSRs, or certificate serial files.
+- Keep the TeamX CA private key with the certificate administrator.
+- Restrict backend ports to the Nginx host when demonstrating service isolation.
+- Restore original firewall rules after every failure demonstration.
