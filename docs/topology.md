@@ -1,19 +1,19 @@
-# Network Topology
-
-Phase 1 has one Nginx reverse proxy and two independent Python HTTP backends:
+# TeamX Topology
 
 ```text
+Mac 1 (10.7.15.60)
+├── dnsmasq :53
+└── Backend A :3001
+
+Mac 2 (10.7.21.116)
+├── Nginx HTTPS :8443
+└── Backend B :3002
+
 Client
-	|
-	| HTTPS :443 (app.team1.test)
-	v
-Nginx reverse proxy
-	|                         |
-	| HTTP :3001              | HTTP :3002
-	v                         v
-Backend A                 Backend B
+└── app.teamX.test / api.teamX.test
+    └── Mac 2
+        ├── Backend A
+        └── Backend B
 ```
 
-The Nginx `backend_pool` upstream contains both backend addresses. Nginx terminates TLS at the client-facing virtual host and proxies requests to the backends over HTTP. Both backend processes must be running and reachable from the Nginx host.
-
-The IP addresses in the source and Nginx configuration are fixed values for the current lab setup. Update them if the hosts or network change; see [IP addresses and ports](ip-addresses.md).
+The Nginx machine is the only public application entry point. Backend ports are direct service ports, not client-facing URLs.

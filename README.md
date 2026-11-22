@@ -8,7 +8,7 @@
 
 This is the Phase 1 lab design: Mac 1 runs DNS and Backend A; Mac 2 runs Nginx HTTPS and Backend B.
 
-> **Status:** This README documents the requested two-Mac target. The current backend and Nginx files still use the previous `team1.test` configuration, port `443`, and different LAN addresses. DNS configuration and the scripts referenced in the proposed layout are not implemented in this checkout. Commands below are setup and verification instructions for the target design, not a claim that the target deployment has already been verified.
+> **Status:** This checkout contains the target two-Mac configuration and runnable backend services. The live DNS, Nginx, firewall, certificate, packet-capture, and failover demonstrations remain hardware/administrator dependent and are not claimed to have been performed in this environment.
 
 ## Team
 
