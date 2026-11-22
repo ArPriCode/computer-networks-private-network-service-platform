@@ -360,6 +360,26 @@ Phase 2 evidence is stored in [evidence](evidence) alongside the collected termi
 | Team evidence 6 | [WhatsApp Image 22.02.13.jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13.jpeg) |
 | Team evidence 7 | [WhatsApp Image 22.02.13 (1).jpeg](evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13%20(1).jpeg) |
 
+#### Phase 2 Screenshot Gallery
+
+<table>
+  <tr>
+    <td width="50%" align="center"><strong>Evidence 1</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.11.jpeg" alt="Phase 2 evidence 1" width="420"></td>
+    <td width="50%" align="center"><strong>Evidence 2</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.11%20(1).jpeg" alt="Phase 2 evidence 2" width="420"></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><strong>Evidence 3</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12.jpeg" alt="Phase 2 evidence 3" width="420"></td>
+    <td width="50%" align="center"><strong>Evidence 4</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12%20(1).jpeg" alt="Phase 2 evidence 4" width="420"></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><strong>Evidence 5</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.12%20(2).jpeg" alt="Phase 2 evidence 5" width="420"></td>
+    <td width="50%" align="center"><strong>Evidence 6</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13.jpeg" alt="Phase 2 evidence 6" width="420"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><strong>Evidence 7</strong><br><img src="./evidence/WhatsApp%20Image%202026-11-22%20at%2022.02.13%20(1).jpeg" alt="Phase 2 evidence 7" width="420"></td>
+  </tr>
+</table>
+
 Before the final demonstration, add focused outputs for each Phase 2 scenario: DNS resolver failover, TTL record changes, backend firewall isolation, backend failover, edge migration, and the diagnosed troubleshooting fault.
 
 ---
