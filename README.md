@@ -5,6 +5,7 @@
 [![Course](https://img.shields.io/badge/Course-Computer_Networks-blue?style=for-the-badge)](#)
 [![Team](https://img.shields.io/badge/Team-StackHackers-0f766e?style=for-the-badge)](#team)
 [![Architecture](https://img.shields.io/badge/Architecture-Two_Mac_LAN-orange?style=for-the-badge)](#architecture)
+[![Status](https://img.shields.io/badge/Status-Phase_1_%26_2_Complete-success?style=for-the-badge)](#project-status)
 
 </div>
 
@@ -14,6 +15,17 @@ This repository contains StackHackers' implementation of a fully local private n
 
 > [!IMPORTANT]
 > This project is intentionally local. No cloud server or public hosting is used. The target private domain is `teamX.test`, and all live services are reachable only on the team's private LAN.
+
+---
+
+## Project Status
+
+| Phase | Status | Outcome |
+| --- | --- | --- |
+| **Phase 1 - Build & Observe** | ✅ Complete | Private DNS, both backends, Nginx HTTPS, load balancing, caching, and protocol evidence |
+| **Phase 2 - Harden & Recover** | ✅ Complete | DNS resilience, TTL behavior, service isolation, backend failover, and edge-migration design |
+
+The repository contains configuration, source code, scripts, screenshots, and packet evidence for the complete project.
 
 ---
 
