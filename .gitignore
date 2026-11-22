@@ -13,6 +13,10 @@ env/
 
 # Local TLS private key
 ssl/key.pem
+ssl/teamx-ca.key
+ssl/*.csr
+ssl/*.srl
+ssl/*.ext
 
 # macOS and editor files
 .DS_Store
